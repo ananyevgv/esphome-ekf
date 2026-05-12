@@ -114,9 +114,10 @@
 
 ## 📁 Структура проекта
 
-text
+
 
 **Пример содержимого `secrets.yaml`:**
+```text
 esphome-ekf/
 ├── RCE-1/
 │ ├── holl-window.yaml # Основной конфиг
@@ -130,7 +131,7 @@ esphome-ekf/
 │ └── humidifier2.yaml # Драйвер увлажнителя
 ├── secrets.yaml # Пароли, ключи, координаты
 └── images/ # Схемы и фото
-
+```
 
 **Пример содержимого `secrets.yaml`:**
 
