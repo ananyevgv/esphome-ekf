@@ -129,11 +129,12 @@ web_password: "пароль_веб"
 ```
 
 # Калибровочные значения BL0942, текущая калибровка (рассчитана для данного экземпляра)
-voltage_reference: 15170
-# Current reference: 251213.468750
-# Energy reference: 4957.052246
-# Power reference: 577.538452
-
+```
+Voltage_reference: 15170
+Current reference: 251213.468750
+Energy reference: 4957.052246
+Power reference: 577.538452
+```
 🔒 Безопасность
 🔐 Все секреты вынесены в !secret
 
