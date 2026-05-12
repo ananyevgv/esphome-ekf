@@ -1,0 +1,414 @@
+#https://templates.blakadder.com/ESP8685-WROOM-06.html
+# https://dzen.ru/a/Zc2dhriN9Wih4KDH
+# https://developer.tuya.com/en/docs/iot/cbu-module-datasheet?id=Ka07pykl5dk4u
+##########################################
+##                 CBU                  ##
+##                                      ##
+##              |CSN IO19|              ##
+##                                      ##
+##  |P14|          |#|            |P15| ##
+##  |P16|          |#|            |P17| ##
+##  |P20| relay_3  |#|            | P9| ##
+##  |P22| relay_2  |#|   CEN      |CEN| ##
+##  |ADC| 17       |#|            |P28| ##
+##  |RX2| 28       |#| bl0942 P10 |RX1| ##
+##  |TX2| 29       |#| bl0942 P11 |TX1| ## 
+##--------------------------------------##
+##|P8| |P7| |P6| |P26| |P24| |GND| |3V3|##
+##  R   R     L    R      B             ##
+##  e   e     e    e      u             ##
+##  l   l     d    l      t             ##
+##  a   a          a      t             ##
+##  y   y          y      o             ##
+##  4   1          5      n             ##
+##########################################
+
+############################################
+##               ESP8685 (C3)             ##
+##                                        ##
+##                 |IO9|                  ##
+##                                        ##
+##  |IO1 | relay_3  |#|            |IO8 | ##
+##  |IO2 | relay_2  |#|            |IO9 | ##
+##  |NC  | relay_3  |#|            |IO10| ##
+##  |NC  | relay_2  |#|            |EN  | ##
+##  |IO0 |          |#|            |NC  | ##
+##  |RX1 | GPIO20   |#| bl0942     |IO19| ##
+##  |TX1 | GPIO21   |#| bl0942     |IO18| ## 
+##----------------------------------------##
+##| 3| | 7| | 6| |  4|  |  5| |GND| |3V3| ##
+##  R   R     L    R      B               ##
+##  e   e     e    e      u               ##
+##  l   l     d    l      t               ##
+##  a   a          a      t               ##
+##  y   y          y      o               ##
+##  4   1          5      n               ##
+############################################
+substitutions:
+  name: "holl-ekf2"
+  friendly_name: EKF Wi-Fi PRO Connect RCE-2-WF
+  device_description:  удлинитель
+  room: "Холл"
+  
+esphome:
+  name: ${name}
+  comment: "${friendly_name}"
+  on_boot:
+    then:
+      - script.execute: check_relays_state
+
+#bk72xx:
+ # board: generic-bk7231n-qfn32-tuya #cbu
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: Esp32C3
+  framework:
+    type: esp-idf
+
+#-------------------------------------------
+# Packages
+#------------------------------------------- 
+packages:
+  wifi: !include packages/wifi.yaml
+  device_base: !include packages/device_base.yaml
+
+
+#-------------------------------------------
+#  UART
+#-------------------------------------------   
+uart:
+  id: uart_bus # BL0942
+  tx_pin: 18 #P11
+  rx_pin: 19 #P10
+  baud_rate: 4800
+  stop_bits: 1
+
+#-------------------------------------------
+#  I2C
+#-------------------------------------------   
+i2c:
+  sda: 8 
+  scl: 9 
+  scan: true 
+
+#-------------------------------------------
+#  GLOBAL
+#-------------------------------------------   
+globals:
+  - id: is_relays_on
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+#-------------------------------------------
+#  LIGHT
+#-------------------------------------------   
+light:
+  - platform: status_led
+    id: wifi_led
+    pin:
+      number: 6 #P6
+      inverted: true
+    internal: false
+
+#-------------------------------------------
+#  SWITCH
+#-------------------------------------------   
+switch:
+  - platform: gpio
+    id: relay_1
+    name: "TV"
+    icon: mdi:television #icon: mdi:power-socket-eu
+    pin: 7 #P7
+    on_turn_on:
+      - script.execute: check_relays_state
+    on_turn_off:
+      - script.execute: check_relays_state
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_2
+    name: "DVD"
+    icon: mdi:disc-player #icon: mdi:power-socket-eu
+    pin: 2 #P22
+    on_turn_on:
+      - script.execute: check_relays_state
+    on_turn_off:
+      - script.execute: check_relays_state
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_3
+    name: "ТВ приставка"
+    icon: mdi:set-top-box #icon: mdi:power-socket-eu
+    pin: 1 #P20
+    on_turn_on:
+      - script.execute: check_relays_state
+    on_turn_off:
+      - script.execute: check_relays_state
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_4
+    name: "Часы"
+    icon: mdi:clock-digital #icon: mdi:power-socket-eu
+    pin: 3 #P8
+    on_turn_on:
+      - script.execute: check_relays_state
+    on_turn_off:
+      - script.execute: check_relays_state
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_5
+    name: "USB"
+    icon: mdi:usb
+    pin: 4 #P26
+    on_turn_on:
+      - script.execute: check_relays_state
+    on_turn_off:
+      - script.execute: check_relays_state
+    restore_mode: RESTORE_DEFAULT_OFF
+
+#-------------------------------------------
+#  BINARY_SENSOR
+#-------------------------------------------   
+binary_sensor:
+  - platform: gpio
+    id: toggle_relays
+    name: toggle_elays
+    device_class: plug
+    internal: true
+    pin:
+      number: 5 #P24
+      inverted: true
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.5s
+        then:
+          - lambda: |-  
+              id(relays_toggle).execute();
+      - timing:
+          - ON for at least 1s
+        then:
+          - lambda: |-  
+              if (id(is_relays_on) == true) {
+                id(off_relays).execute();
+              } else {
+                id(on_relays).execute();
+              }
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at most 0.5s
+          - ON for at most 0.5s
+          - OFF for at least 0.5s
+        then:
+          - lambda: |-  
+              id(off_relays).execute();
+
+  - platform: analog_threshold
+    name: "current overload"
+    sensor_id: current
+    device_class: problem
+    threshold: 16
+    id: current_overload
+    on_press:
+      then:
+        - switch.turn_off: relay_1
+        - switch.turn_off: relay_2
+        - switch.turn_off: relay_3
+        - switch.turn_off: relay_4
+        - switch.turn_off: relay_5
+
+  - platform: analog_threshold
+    name: "voltage overload"
+    sensor_id: voltage
+    device_class: problem
+    threshold: 253
+    id: voltage_overload
+    on_press:
+      then:
+        - switch.turn_off: relay_1
+        - switch.turn_off: relay_2
+        - switch.turn_off: relay_3
+        - switch.turn_off: relay_4
+        - switch.turn_off: relay_5
+
+#-------------------------------------------
+#  SCRIPT
+#-------------------------------------------   
+script:
+  - id: on_relays
+    then:
+      - switch.turn_on: relay_1
+      - delay: 30ms
+      - switch.turn_on: relay_2
+      - delay: 30ms
+      - switch.turn_on: relay_3
+      - delay: 30ms
+      - switch.turn_on: relay_4
+      - delay: 30ms
+      - switch.turn_on: relay_5
+      - delay: 30ms
+      - light.turn_on: wifi_led
+  - id: off_relays
+    then:
+      - switch.turn_off: relay_1
+      - delay: 30ms
+      - switch.turn_off: relay_2
+      - delay: 30ms
+      - switch.turn_off: relay_3
+      - delay: 30ms
+      - switch.turn_off: relay_4
+      - delay: 30ms
+      - switch.turn_off: relay_5
+      - delay: 30ms
+      - light.turn_off: wifi_led
+  - id: check_relays_state
+    then:
+      - if:
+          condition:
+            or:
+              - switch.is_on: relay_1
+              - switch.is_on: relay_2
+              - switch.is_on: relay_3
+              - switch.is_on: relay_4
+              - switch.is_on: relay_5
+          then:
+            - lambda: "id(is_relays_on) = true;"
+            - light.turn_on: wifi_led
+          else:
+            - lambda: "id(is_relays_on) = false;"
+            - light.turn_off: wifi_led
+            
+  - id: relays_toggle
+    then:
+      - if:
+          condition:
+            and:
+              - switch.is_off: relay_1
+              - switch.is_off: relay_2
+              - switch.is_off: relay_3
+              - switch.is_off: relay_4
+              - switch.is_off: relay_5
+          then:
+            - switch.turn_on: relay_1
+            - lambda: "id(is_relays_on) = true;"
+            - light.turn_on: wifi_led
+          else:
+            - if:
+                condition:
+                  and:
+                    - switch.is_on: relay_1
+                    - switch.is_off: relay_2
+                    - switch.is_off: relay_3
+                    - switch.is_off: relay_4
+                    - switch.is_off: relay_5
+                then:
+                  - switch.turn_on: relay_2
+                  - lambda: "id(is_relays_on) = true;"
+                  - light.turn_on: wifi_led
+                else:
+                  - if:
+                      condition:
+                        and:
+                          - switch.is_on: relay_1
+                          - switch.is_on: relay_2
+                          - switch.is_off: relay_3
+                          - switch.is_off: relay_4
+                          - switch.is_off: relay_5
+                      then:
+                        - switch.turn_on: relay_3
+                        - lambda: "id(is_relays_on) = true;"
+                        - light.turn_on: wifi_led
+                      else:
+                        - if:
+                            condition:
+                              and:
+                                - switch.is_on: relay_1
+                                - switch.is_on: relay_2
+                                - switch.is_on: relay_3
+                                - switch.is_off: relay_4
+                                - switch.is_off: relay_5
+                            then:
+                              - switch.turn_on: relay_4
+                              - lambda: "id(is_relays_on) = true;"
+                              - light.turn_on: wifi_led
+                            else:
+                              - if:
+                                  condition:
+                                    and:
+                                      - switch.is_on: relay_1
+                                      - switch.is_on: relay_2
+                                      - switch.is_on: relay_3
+                                      - switch.is_on: relay_4
+                                      - switch.is_off: relay_5
+                                  then:
+                                    - switch.turn_on: relay_5
+                                    - lambda: "id(is_relays_on) = true;"
+                                    - light.turn_on: wifi_led
+                                  else:
+                                    - switch.turn_off: relay_1
+                                    - switch.turn_off: relay_2
+                                    - switch.turn_off: relay_3
+                                    - switch.turn_off: relay_4
+                                    - switch.turn_off: relay_5
+                                    - lambda: "id(is_relays_on) = false;"
+                                    - light.turn_off: wifi_led
+
+#-------------------------------------------
+#  BUTTON
+#-------------------------------------------   
+button:
+  - platform: template
+    id: toggle_relays_btn
+    name: "Toggle"
+    icon: mdi:toggle-switch
+    on_press:
+      then:
+        - lambda: |-  
+            if (id(is_relays_on) == true) {
+              id(off_relays).execute();
+            } else {
+              id(on_relays).execute();
+            }
+
+#-------------------------------------------
+#  SENSOR
+#-------------------------------------------   
+sensor:    
+  - platform: bl0942
+    uart_id: uart_bus
+    voltage:
+      id: voltage
+      name: voltage
+      filters: 
+        - delta: 0.5
+    voltage_reference: 15170
+    current:
+      id: current
+      name: current
+      filters: 
+        - delta: 0.1
+    power:
+      id: power
+      name: power
+      filters:
+        - multiply: -1
+        - delta: 1
+    energy:
+      id: energy
+      name: energy
+      filters:
+        - delta: 5
+    frequency:
+      id: frequency
+      name: frequency
+      accuracy_decimals: 0
+      filters:
+        - delta: 1
+    update_interval: 0.5s
+
+# Current reference: 251213.468750
+# Energy reference: 4957.052246
+# Power reference: 577.538452
