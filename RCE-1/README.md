@@ -88,7 +88,8 @@ WPA2 для WiFi
 Отдельная авторизация для веб-интерфейса
 
 Структура проекта
-text
+
+```
 esphome-ekf/
 ├── RCE-1/
 │   ├── holl-window.yaml       # Основной конфиг
@@ -100,10 +101,8 @@ esphome-ekf/
 │       ├── sun.yaml           # Положение солнца
 │       ├── Tuya_MB60L.yaml    # Драйвер жалюзи
 │       └── humidifier2.yaml   # Драйвер увлажнителя
-Требования к среде
-ESPHome (поддержка esp-idf framework)
 
-Home Assistant (для binary_sensor и автоматизаций)
+```
 
 Секреты: secrets.yaml с параметрами WiFi, API, OTA, географическими координатами
 
