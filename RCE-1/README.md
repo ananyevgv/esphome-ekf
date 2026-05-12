@@ -1,3 +1,5 @@
+[Базовая конфигурация + реле включения USB](./holl-ekf1.yaml) 
+
 # 🪟 Умный контроллер окна
 
 > Автоматизация оконных и климатических систем в помещении на базе ESP32-S3
@@ -111,3 +113,34 @@
 ---
 
 ## 📁 Структура проекта
+esphome-ekf/
+├── RCE-1/
+│ ├── holl-window.yaml # Основной конфиг
+│ └── packages/ # Модульные компоненты
+│ ├── wifi.yaml # WiFi + API + OTA + сигнал WiFi
+│ ├── device_base.yaml # Базовая конфигурация
+│ ├── web.yaml # Веб-сервер (с авторизацией)
+│ ├── time.yaml # SNTP (UTC-3)
+│ ├── sun.yaml # Положение солнца (восход/закат)
+│ ├── Tuya_MB60L.yaml # Драйвер жалюзи
+│ └── humidifier2.yaml # Драйвер увлажнителя
+├── secrets.yaml # Пароли, ключи, координаты
+└── images/ # Схемы и фото
+
+
+**Пример содержимого `secrets.yaml`:**
+
+```yaml
+wifi_ssid: "ваша_сеть"
+wifi_password: "пароль"
+api_key: "ключ_шифрования"
+ota_password: "пароль_ota"
+web_username: "admin"
+web_password: "пароль_веб"
+latitude: 55.75
+longitude: 37.62
+```
+
+![Контроллер окна](./images/ekf1_4.png)
+![Схема замены платы](./images/Schematic_ekf_2026-05-12.png)
+
