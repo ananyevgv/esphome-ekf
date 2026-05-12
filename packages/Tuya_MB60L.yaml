@@ -1,0 +1,258 @@
+#-------------------------------------------
+# Add yaml 
+#packages:
+#  mb60l: !include 
+#    file: packages/Tuya_MB60L.yaml
+#    vars:
+#      blind_id: holl_l
+#      tuya_mcu_rx: 20
+#      tuya_mcu_tx: 21
+#      open_weekends: 9
+#      open_workday: 7
+# and copy file esphome/packages/
+
+#-------------------------------------------
+# External_components:
+#------------------------------------------- 
+external_components:
+  - source:
+      type: local
+      path: my_components
+    components: [ tuya ]
+    refresh: always   
+
+#-------------------------------------------
+# Uart
+#------------------------------------------- 
+uart:
+  - id: uart_${blind_id}
+    tx_pin: $tuya_mcu_tx
+    rx_pin: $tuya_mcu_rx
+    baud_rate: 9600
+
+#-------------------------------------------
+# Tuya
+#------------------------------------------- 
+tuya:
+  - id: mcu_$blind_id
+    uart_id: uart_${blind_id}
+
+#-------------------------------------------
+# Sensor
+#------------------------------------------- 
+sensor:
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    sensor_datapoint: 19
+    id: best_position_${blind_id}
+
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "battary${blind_id}"
+    sensor_datapoint: 13
+    unit_of_measurement: "%"
+    device_class: battery
+    icon: "mdi:battery"
+
+#-------------------------------------------
+# Switch
+#------------------------------------------- 
+switch:
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "CHILD LOCK${blind_id}"
+    switch_datapoint: 101
+    icon: "mdi:lock"
+
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    id: tilt_mode_${blind_id}
+   # name: tilt mode
+    switch_datapoint: 103
+
+#-------------------------------------------
+# Select
+#------------------------------------------- 
+select:
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "rotation${blind_id}"
+    enum_datapoint: 11
+    optimistic: true
+    icon: "mdi:swap-horizontal"
+    options:
+      0: Forbard
+      1: Reverse
+
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "Speed${blind_id}"
+    enum_datapoint: 104
+    optimistic: true
+    options:
+      0: Low
+      1: Medium
+      2: Hight   
+      
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "Save pozition${blind_id}"
+    enum_datapoint: 16
+    optimistic: true
+    options:
+      0: UP
+      1: DOWN
+      2: RESET
+
+#-------------------------------------------
+# Number
+#------------------------------------------- 
+number:
+  - platform: "tuya"
+    tuya_id: mcu_$blind_id
+    name: "Best position${blind_id}"
+    number_datapoint: 19
+    min_value: 0
+    max_value: 100
+    step: 10
+
+#-------------------------------------------
+# Cover
+#------------------------------------------- 
+cover:
+  - platform: tuya
+    name: "Motor${blind_id}"
+    tuya_id: mcu_$blind_id
+    id: cover_${blind_id}
+    control_datapoint: 1
+    position_datapoint: 9
+    position_report_datapoint: 8
+    direction_datapoint: 11
+    restore_mode: NO_RESTORE
+    min_value: 0
+    max_value: 100
+    device_class: blind
+   
+   #lambda: |-
+   # if (id(closed_endstop).state) {
+   #        return COVER_CLOSED;
+       #   } else {
+   #       return COVER_OPEN;
+   #             }    
+   
+#-------------------------------------------
+# Button
+#------------------------------------------- 
+button:
+  - platform: template
+    name: "Open tilt${blind_id}"   
+    icon: mdi:blinds-horizontal-closed
+    on_press: 
+      then:
+        - switch.turn_on: tilt_mode_${blind_id}
+        - delay: 0.2s 
+        - cover.open: cover_${blind_id}
+        - delay: 1s 
+        - switch.turn_off: tilt_mode_${blind_id}
+
+  - platform: template
+    name: "Close tilt${blind_id}"   
+    icon: mdi:roller-shade-closed
+    on_press: 
+      then:
+        - switch.turn_on: tilt_mode_${blind_id}
+        - delay: 0.2s 
+        - cover.close: cover_${blind_id}
+        - delay: 1s 
+        - switch.turn_off: tilt_mode_${blind_id}
+
+  - platform: template
+    name: "Open best position${blind_id}" 
+    icon: mdi:roller-shade
+    on_press: 
+      then:
+        - cover.control:
+            id: cover_${blind_id}
+            position: !lambda |- 
+              return id(best_position_${blind_id}).state / 100;
+  
+#-------------------------------------------
+#  BINARY_SENSOR
+#-------------------------------------------   
+binary_sensor:
+  - id: !extend led_1
+    on_press:
+      then:
+        - cover.close: cover_${blind_id}
+  - id: !extend led_2
+    on_press:
+      then:
+        - cover.close: cover_${blind_id}
+        
+#-------------------------------------------
+# SUN 
+#------------------------------------------- 
+sun:
+  id: sun_state
+# Расвет
+  on_sunrise:
+    - if:
+        condition:
+          lambda: 'return id(sntp_time).now().hour >= $open_weekends;'
+        then:
+          - cover.open: cover_${blind_id}
+# Закат
+  on_sunset:
+    then:
+      - cover.close: cover_${blind_id}
+      
+#-------------------------------------------
+# TIME
+#-------------------------------------------            
+time:
+  - id: !extend sntp_time
+    on_time:
+# workday 
+      - hours: $open_workday
+        minutes: '0'
+        seconds: 0
+        then:
+          - if:
+              condition:
+                and:
+                  - sun.is_above_horizon:
+                  - binary_sensor.is_on: workday_sensor
+              then:
+                - cover.open: cover_${blind_id}
+# weekends
+      - hours: $open_weekends
+        minutes: '0'
+        seconds: 0
+        then:
+          - if:
+              condition:
+                - sun.is_above_horizon:
+              then:
+                - cover.open: cover_${blind_id}   
+                
+
+# MB60L
+#[tuya:075]:   Datapoint 1: enum (value: 1)
+#[tuya:071]:   Datapoint 9: int value (value: 100)
+#[tuya:071]:   Datapoint 8: int value (value: 100)
+#[tuya:075]:   Datapoint 11: enum (value: 0)
+#[tuya:069]:   Datapoint 103: switch (value: OFF)
+#[tuya:069]:   Datapoint 101: switch (value: OFF)
+#[tuya:071]:   Datapoint 19: int value (value: 50)
+#[tuya:075]:   Datapoint 104: enum (value: 2)
+#[tuya:087]:   Product: '{"p":"ane3cx9ffd45xdpl","v":"1.0.0","m":2,"mt":3,"n":0}'
+
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_COVER_STATE_DP                0x01 //ENUM OPEN(0) STOP (1) CLOSE(2)	01
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_COVER_POSITION_DP             0x09					09
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_DIRECTION_DP                  0x0B  					11
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_BATTERY_DP                    0x0D					13
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_SET_LIMITS_DP                 0x10 //UP(0), DOWN(1), RESET(2)		16
+###define Z2S_ROLLER_SHUTTER_FNC_TUYA_MB60L_COVER        	          0x13					19
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_CHILD_LOCK_DP                 0x65					101
+#define TUYA_MB60L_SMART_BLINDS_MOTOR_TILT_MODE_DP                  0x67					103
+#####define Z2S_DEVICE_DESC_TUYA_MB60L_SMART_BLINDS_MOTOR           0x4824

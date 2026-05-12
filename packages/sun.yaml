@@ -1,0 +1,62 @@
+# -------------------------------------------
+#  Add yaml and copy file esphome/packages/sensor/
+#packages:
+#  sun: !include file: packages/sensor/sun.yaml
+# -------------------------------------------
+
+#-------------------------------------------
+# SUN 
+#------------------------------------------- 
+sun:
+  id: sun_state
+  latitude: !secret latitude
+  longitude: !secret longitude
+
+#-------------------------------------------
+# SENSOR 
+#------------------------------------------- 
+sensor:
+  - platform: sun
+    name: "Sun Elevation" 
+    disabled_by_default: true
+    type: elevation
+    id: elevation 
+
+  - platform: sun
+    name: "Sun Azimuth" 
+    disabled_by_default: true
+    type: azimuth
+    
+#-------------------------------------------
+# TEXT SENSOR 
+#------------------------------------------- 
+text_sensor:
+  - platform: sun
+    name: "Sun Next Sunrise"
+    disabled_by_default: true
+    type: sunrise
+    id: next_sunrise_time
+    
+  - platform: sun
+    name: "Sun Next Sunset"
+    disabled_by_default: true
+    type: sunset
+    id: next_sunset_time 
+    
+  - platform: template
+    name: Next Sun Event
+    update_interval: 60s
+    id: next_sun_event
+    icon: mdi:sun-clock
+    lambda: |-
+      auto now = id(sntp_time).now();
+      if (!now.is_valid())
+        return {"--:--"};  // Время не синхронизировано
+      std::string target_str = "23:59:59";
+      target_str = id(sun_state).is_above_horizon()?id(next_sunset_time).state:id(next_sunrise_time).state;
+      time_t target_ts = std::stoi(target_str.substr(0, 2)) * 60 + std::stoi(target_str.substr(3, 2));
+      // Вычисляем разницу в минутах
+      unsigned short delta = (target_ts - now.hour*60 - now.minute);
+      char buffer[10];
+      sprintf(buffer, "%02d:%02d", delta / 60, delta % 60);
+      return {buffer};

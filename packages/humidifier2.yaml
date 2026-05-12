@@ -1,0 +1,179 @@
+#https://github.com/dhewg/esphome-miot/wiki/Smartmi-Evaporative-Humidifier-2
+#https://github.com/dhewg/esphome-miot/blob/main/config/zhimi.humidifier.ca4.yaml
+#############################################
+##             ESP32 WROOM 32d             ##
+##  |GND |           |#|            |GND | ##
+##  |3V3 |           |#|            |IO23| ##
+##  |EN  |           |#|            |IO22| ##
+##  |IO36|           |#|        tx  |IO1 | ##
+##  |IO39|           |#|        rx  |IO3 | ##
+##  |IO34|           |#|            |IO21| ##
+##  |IO35|           |#|            |    | ##
+##  |IO32|           |#|            |IO19| ##
+##  |IO33|           |#|            |IO18| ##
+##  |IO25|           |#|            |IO5 | ##
+##  |IO26|           |#|        TX  |IO17| ##
+##  |IO27|           |#|        RX  |IO16| ##
+##  |IO14|           |#|            |IO4 | ##
+##  |IO12|           |#|      boot  |IO0 | ##
+##-----------------------------------------##
+##|GND||13|| 9||10||11|| 6|| 7|| 8||15|| 2|##
+##                                       b ##
+##                                       o ##
+##                                       o ##
+##                                       t ##
+#############################################
+
+#-------------------------------------------
+# Add yaml 
+#packages:
+#  humidifier2: !include 
+#    file: packages/humidifier2.yaml
+#    vars:
+#      tx_miot:  GPIO17
+#      rx_miot:  GPIO16
+# and copy file esphome/packages/
+
+#-------------------------------------------
+# external components
+#------------------------------------------- 
+external_components:
+  - source: github://dhewg/esphome-miot
+  
+#-------------------------------------------
+#  API
+#-------------------------------------------   
+api:
+  services:
+    - service: mcu_command
+      variables:
+        command: string
+      then:
+        - lambda: 'id(miot_main).queue_command(command);'
+
+#-------------------------------------------
+# UART
+#-------------------------------------------   
+uart:
+  - id: bus_miot
+    tx_pin: $tx_miot
+    rx_pin: $rx_miot
+    baud_rate: 115200
+    
+#-------------------------------------------
+# MIOT
+#------------------------------------------- 
+miot:
+  id: miot_main
+  uart_id: bus_miot
+
+#-------------------------------------------
+#  SWITCH
+#-------------------------------------------   
+switch:
+  - platform: "miot"
+    miot_siid: 2
+    miot_piid: 8
+    name: "Dry"
+    icon: mdi:water-minus
+  - platform: "miot"
+    miot_siid: 4
+    miot_piid: 1
+    name: "Notification Sounds"
+    icon: mdi:volume-high
+    entity_category: config
+  - platform: "miot"
+    miot_siid: 6
+    miot_piid: 1
+    name: "Child Lock"
+    icon: mdi:lock
+    entity_category: config
+  - platform: "miot"
+    miot_siid: 7
+    miot_piid: 5
+    name: "Clean Mode"
+    icon: mdi:water-minus
+    entity_category: config
+    
+#-------------------------------------------
+# SENSOR
+#-------------------------------------------  
+sensor:  
+  - platform: "miot"
+    miot_siid: 2
+    miot_piid: 2
+    name: "Device Fault Code"
+    icon: mdi:fan-alert
+    entity_category: diagnostic
+  - platform: "miot"
+    miot_siid: 3
+    miot_piid: 7
+    name: "Temperature"
+    unit_of_measurement: "°C"
+    device_class: temperature
+    state_class: "measurement"
+    icon: mdi:thermometer
+  - platform: "miot"
+    miot_siid: 3
+    miot_piid: 9
+    name: "Relative Humidity"
+    unit_of_measurement: "%"
+    device_class: humidity
+    state_class: "measurement"
+    icon: mdi:water-percent
+  - platform: "miot"
+    miot_siid: 2
+    miot_piid: 7
+    name: "Water Level"
+    unit_of_measurement: "%"
+    state_class: "measurement"
+    icon: mdi:water-percent
+    filters:
+      - clamp:
+          min_value: 0
+          max_value: 100
+          ignore_out_of_range: true
+  - platform: "miot"
+    miot_siid: 2
+    miot_piid: 11
+    name: "Motor Speed"
+    unit_of_measurement: "rpm"
+    icon: mdi:fan
+  - platform: "miot"
+    miot_siid: 7
+    miot_piid: 1
+    name: "Actual Speed"
+    unit_of_measurement: "rpm"
+    icon: mdi:fan
+
+#-------------------------------------------
+# FAN
+#------------------------------------------- 
+fan:
+  - platform: "miot"
+    name: "Fan"
+    state:
+      miot_siid: 2
+      miot_piid: 1
+    speed:
+      miot_siid: 2
+      miot_piid: 5
+      min_value: 0
+      max_value: 3
+
+#-------------------------------------------
+# Select
+#------------------------------------------- 
+select:
+  - platform: "miot"
+    miot_siid: 5
+    miot_piid: 2
+    name: "Display brightness"
+    icon: mdi:brightness-6
+    entity_category: config
+    options:
+      0: "Dark"
+      1: "Glimmer"
+      2: "Brightest"
+
+    
