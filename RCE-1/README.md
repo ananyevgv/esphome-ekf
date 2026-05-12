@@ -23,7 +23,7 @@
 
 I2C (для датчиков): SDA=8, SCL=9
 
-Tuya MB60L: две пары UART (GPIO12/13 и GPIO10/11)
+Tuya MB60L: две пары UART (GPIO12/13 и GPIO10/11) для использования 2 необходимо изменить MULTI_CONF = True в компоненте
 
 Увлажнитель MIoT: UART (GPIO44/43)
 
