@@ -1,0 +1,230 @@
+#######################################
+##       ESP32S3-Zero Mini           ##
+##  |5V|        |#|   TX |43| HUMM   ##
+##  |GN|        |#|   RX |44| HUMM   ##
+##  |3v|        |#|      |13| TUYA1  ##
+##  | 1| Relay4 |#|      |12| TUYA1  ##
+##  | 2| Relay3 |#|      |11| TUYA2  ##
+##  | 3| Led    |#|      |10| TUYA2  ##
+##  | 4| Button |#|      | 9| SCL    ##
+##  | 5| Relay2 |#|      | 8| SDA    ## 
+##  | 6| Relay1 |#|      | 7| Relay5 ## 
+#######################################
+
+substitutions:
+  name: "holl-window"
+  friendly_name: EKF Wi-Fi PRO Connect RCE-1-WF
+  device_description:  Контроллер окна
+  room: "Холл"
+
+esp32:
+  board: esp32-s3-devkitm-1
+  variant: ESP32S3
+  framework:
+    type: esp-idf
+logger:
+  
+#-------------------------------------------
+#  I2C
+#-------------------------------------------   
+i2c:
+  sda: 8 
+  scl: 9 
+  scan: true 
+
+#-------------------------------------------
+# Packages
+#------------------------------------------- 
+packages:
+  wifi: !include packages/wifi.yaml
+  device_base: !include packages/device_base.yaml
+  web: !include included/web.yaml
+  time: !include included/time.yaml
+  sun: !include packages/sensor/sun.yaml
+
+  humidifier2: !include 
+    file: packages/humidifier2.yaml
+    vars:
+      tx_miot:  GPIO44
+      rx_miot:  GPIO43
+      
+  mb60l: !include 
+    file: packages/Tuya_MB60L.yaml
+    vars:
+      blind_id: _l
+      tuya_mcu_rx: 12
+      tuya_mcu_tx: 13
+      open_weekends: 9
+      open_workday: 7
+
+  mb60p: !include 
+    file: packages/Tuya_MB60L.yaml
+    vars:
+      blind_id: _p
+      tuya_mcu_rx: 10
+      tuya_mcu_tx: 11
+      open_weekends: 9
+      open_workday: 7
+
+#-------------------------------------------
+# SUN 
+#------------------------------------------- 
+sun:
+  id: sun_state
+  on_sunset:
+    then:
+      switch.turn_on: relay_3
+
+#-------------------------------------------
+# TIME
+#-------------------------------------------            
+time:
+  - id: !extend sntp_time
+    on_time:
+      - hours: 9
+        minutes: 0
+        seconds: 0
+        then:
+          - switch.turn_on: relay_4
+
+      - hours: 23
+        minutes: 0
+        seconds: 0
+        then:
+          - switch.turn_off: relay_3
+          - switch.turn_off: relay_4
+
+#-------------------------------------------
+#  LIGHT
+#-------------------------------------------   
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO3
+    num_leds: 1
+    chipset: ws2812
+    id: wifi_led
+    name: "Light status"
+
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    pin: GPIO21
+    num_leds: 1
+    chipset: ws2812
+    id: board_led
+    name: "Light board"
+
+#-------------------------------------------
+#  SWITCH
+#-------------------------------------------   
+switch:
+  - platform: gpio
+    id: relay_1
+    name: "Розетка 1"
+    icon: mdi:power-socket-eu
+    pin: 6 #P7
+
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_2
+    name: "Увлажнитель"
+    icon: mdi:air-humidifier
+    pin: 5 #P22
+
+    restore_mode: RESTORE_DEFAULT_OFF
+  - platform: gpio
+    id: relay_3
+    name: "Свет аквариум"
+    icon: mdi:desk-lamp
+    pin: 2 #P20
+
+  - platform: gpio
+    id: relay_4
+    name: "Фильтр аквариум"
+    icon: mdi:air-filter
+    pin:
+      number: 1 #P8
+      inverted: True
+
+  - platform: gpio
+    id: relay_5
+    name: "Жалюзи"
+    icon: mdi:blinds-horizontal-closed
+    pin:
+      number: 7 #P26
+      inverted: true
+    restore_mode: ALWAYS_ON
+
+#-------------------------------------------
+#  BINARY_SENSOR
+#-------------------------------------------   
+binary_sensor:
+  - platform: gpio
+    id: toggle_relays
+    name: toggle_elays
+    device_class: plug
+    internal: true
+    pin:
+      number: 4 #P24
+      inverted: true
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.5s
+        then:
+          - script.execute: on_relays
+      - timing:
+          - ON for at least 1s
+        then:
+          - script.execute: off_relays
+
+  - platform: homeassistant
+    id: led_1
+    entity_id: light.holl_led_1
+    trigger_on_initial_state: true
+    #internal: true
+
+  - platform: homeassistant
+    id: led_2
+    entity_id: light.holl_led_2
+    trigger_on_initial_state: true
+    #internal: true
+
+  - platform: homeassistant
+    id: workday_sensor
+    entity_id: binary_sensor.workday_sensor
+    trigger_on_initial_state: true
+
+#-------------------------------------------
+#  SCRIPT
+#-------------------------------------------   
+script:
+  - id: on_relays
+    then:
+      - switch.turn_on: relay_1
+      - delay: 30ms
+      - switch.turn_on: relay_2
+      - delay: 30ms
+      - switch.turn_on: relay_3
+      - delay: 30ms
+      - switch.turn_on: relay_4
+      - delay: 30ms
+      - switch.turn_on: relay_5
+      - delay: 30ms
+      - light.turn_on: wifi_led
+  - id: off_relays
+    then:
+      - switch.turn_off: relay_1
+      - delay: 30ms
+      - switch.turn_off: relay_2
+      - delay: 30ms
+      - switch.turn_off: relay_3
+      - delay: 30ms
+      - switch.turn_off: relay_4
+      - delay: 30ms
+      - switch.turn_off: relay_5
+      - delay: 30ms
+      - light.turn_off: wifi_led

@@ -1,0 +1,170 @@
+#https://dzen.ru/a/ZCA53H60nU4YFfMt?ysclid=m3a85yrbkj416294983
+##########################################
+##               TYWE3S                 ##
+##  |RS|          |#|     |tx|  LED     ##
+##  |adc|         |#|     |rx|          ##
+##  |en|          |#|     | 5|          ##
+##  |16| button   |#|     | 4|          ##
+##  |14|          |#|     | 0|          ##
+##  |12|          |#|     | 2| relay USB##
+##  |13|          |#|     |15| relay AC ## 
+##  |3V|          |#|     |GN|          ##
+##########################################
+
+substitutions:
+  name: "holl-ekf1"
+  friendly_name: EKF Wi-Fi PRO Connect RCE-1-WF
+  room: "Холл"
+  
+esp8266:
+  board: esp01_1m
+
+esphome:
+  name: "${name}"
+  comment: "${friendly_name}"
+
+# Enable logging
+logger:
+   baud_rate: 0
+
+#-------------------------------------------
+# I2C
+#-------------------------------------------
+i2c:
+   sda: 4 
+   scl: 5 
+   scan: true 
+
+#-------------------------------------------
+# Packages
+#------------------------------------------- 
+packages:
+  wifi: !include packages/wifi.yaml
+  device_base: !include packages/device_base.yaml
+
+#-------------------------------------------
+# SENSOR
+#-------------------------------------------
+sensor: 
+  - platform: ina226
+    address: 0x40
+    shunt_resistance: 0.1 ohm
+    max_current: 3.2A
+    # adc time used for both, Bus Voltage and Shunt Voltage
+    adc_time: 140us
+    adc_averaging: 128
+    update_interval: 60s
+    current:
+      name: "Current"
+    power:
+      name: "Power"
+    bus_voltage:
+      name: "Bus Voltage"
+    shunt_voltage:
+      name: "Shunt Voltage"
+
+#-------------------------------------------
+# SWITCH
+#-------------------------------------------
+switch:
+  - platform: gpio
+    name: "Розетки"
+    pin: GPIO15
+    id: relay_AC
+    icon: mdi:power-socket-eu    
+    restore_mode: ALWAYS_ON
+  - platform: gpio
+    name: "USB"
+    pin:
+      number: GPIO2
+      inverted: True
+    id: relay_USB
+    icon: mdi:usb-port
+    restore_mode: ALWAYS_ON
+
+#-------------------------------------------
+# BINARY_SENSOR
+#-------------------------------------------
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO16
+      mode:
+        input: true
+      inverted: true
+    name: "button"
+    on_multi_click:
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at least 0.5s
+        then:
+          - lambda: |-  
+              id(relays_toggle).execute();
+      - timing:
+          - ON for at least 1s
+        then:  
+          - switch.turn_on: relay_AC
+          - switch.turn_on: relay_USB
+          - light.turn_on: usb_light
+      - timing:
+          - ON for at most 0.5s
+          - OFF for at most 0.5s
+          - ON for at most 0.5s
+          - OFF for at least 0.5s
+        then:
+          - switch.turn_off: relay_AC
+          - switch.turn_off: relay_USB         
+          - light.turn_off: usb_light
+
+#-------------------------------------------
+# LIGHT
+#-------------------------------------------
+light:
+  - platform: binary
+    name: "USB"
+    output: usb
+    id: usb_light
+    internal: true
+
+#-------------------------------------------
+# OUTPUT
+#-------------------------------------------
+output:
+  - platform: gpio
+    pin: GPIO1
+    id: usb
+    inverted: true
+
+#-------------------------------------------
+# SCRIPT
+#-------------------------------------------
+script:
+  - id: relays_toggle
+    then:
+      - if:
+          condition:
+            or:
+              - switch.is_off: relay_AC
+              - switch.is_off: relay_USB
+          then:
+            - switch.turn_on: relay_AC
+            - light.turn_on: usb_light
+          else:
+            - if:
+                condition:
+                  or:
+                    - switch.is_on: relay_AC
+                    - switch.is_off: relay_USB
+                then:
+                  - switch.turn_on: relay_USB
+                  - light.turn_on: usb_light
+                else:
+                  - if:
+                      condition:
+                        or:
+                          - switch.is_on: relay_AC
+                          - switch.is_on: relay_USB
+                      then:
+                        - switch.turn_off: relay_AC
+                        - switch.turn_off: relay_USB
+                        - light.turn_off: usb_light  
