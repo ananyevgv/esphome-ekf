@@ -130,10 +130,10 @@ esphome-ekf/
 
 ```yaml
 wifi_ssid: "ваша_сеть"
-wifi_password: "пароль"
+wifi_password: "ваша пароль"
 api_key: "ключ_шифрования"
 ota_password: "пароль_ota"
-web_username: "admin"
+web_username: "имя пользователя"
 web_password: "пароль_веб"
 latitude: 55.75
 longitude: 37.62
