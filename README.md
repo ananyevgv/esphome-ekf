@@ -41,7 +41,7 @@
 
 | RCE-1-WF | RCE-2-WF |
 |:---:|:---:|
-| <sub>Одноканальный Wi-Fi удлинитель<./RCE-1-W.jpg> | <sub>Пятиканальный Wi-Fi удлинитель<./RCE-2-W.jpg> |
+| <sub>Одноканальный Wi-Fi удлинитель<img src="./RCE-1-W.jpg" width="250"> | <sub>Пятиканальный Wi-Fi удлинитель<img src="./RCE-2-W.jpg" width="250"> |
 
 </div>
 
