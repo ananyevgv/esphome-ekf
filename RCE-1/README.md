@@ -112,7 +112,8 @@
 esphome-ekf/
 ├── RCE-1/
 │ ├── holl-window.yaml # Основной конфиг
-│ └── packages/ # Модульные компоненты
+│ ├── images/ # Схемы и фото
+├── packages/ # Модульные компоненты
 │ ├── wifi.yaml # WiFi + API + OTA + сигнал WiFi
 │ ├── device_base.yaml # Базовая конфигурация
 │ ├── web.yaml # Веб-сервер (с авторизацией)
@@ -120,8 +121,7 @@ esphome-ekf/
 │ ├── sun.yaml # Положение солнца (восход/закат)
 │ ├── Tuya_MB60L.yaml # Драйвер жалюзи
 │ └── humidifier2.yaml # Драйвер увлажнителя
-├── secrets.yaml # Пароли, ключи, координаты
-└── images/ # Схемы и фото
+
 ```
 
 **Пример содержимого `secrets.yaml`:**
