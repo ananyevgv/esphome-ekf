@@ -19,8 +19,9 @@ substitutions:
 
 esphome:
   on_boot:
-    then:  
-      - light.addressable_set:
+    then: 
+      - light.turn_on:
+          brightness: 100%
           id: wifi_led
           red: 0%
           green: 70%
@@ -125,6 +126,7 @@ light:
     chipset: ws2812
     id: wifi_led
     name: "Light status"
+  #  restore_mode: ALWAYS_ON
 
 #  - platform: esp32_rmt_led_strip
 #    rgb_order: GRB
@@ -184,11 +186,11 @@ binary_sensor:
     id: toggle_relays
     name: toggle_elays
     device_class: plug
-    internal: true
+    internal: false
     pin:
       number: 4 #P24
       inverted: true
-      mode: INPUT_PULLDOWN
+      mode: INPUT_PULLUP
     filters:
       - delayed_off: 10ms
     on_multi_click:
@@ -235,7 +237,8 @@ script:
       - delay: 30ms
       - switch.turn_on: relay_5
       - delay: 30ms
-      - light.addressable_set:
+      - light.turn_on:
+          brightness: 100%
           id: wifi_led
           red: 0%
           green: 70%
