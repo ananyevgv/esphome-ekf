@@ -20,6 +20,7 @@ substitutions:
 esphome:
   on_boot:
     then: 
+      - delay: 500ms
       - light.turn_on:
           brightness: 100%
           id: wifi_led
