@@ -27,6 +27,10 @@ esphome:
           red: 0%
           green: 70%
           blue: 0%
+      - delay: 1s
+      - select.set:
+          id: rotation_l
+          option: "Reverse"
 
 esp32:
   board: esp32-s3-devkitm-1
@@ -78,6 +82,7 @@ packages:
       tuya_mcu_tx: 13
       open_weekends: 9
       open_workday: 7
+      rotation: "Reverse"
 
   mb60p: !include 
     file: packages/Tuya_MB60L.yaml
@@ -87,7 +92,8 @@ packages:
       tuya_mcu_tx: 11
       open_weekends: 9
       open_workday: 7
-
+      rotation: 
+      
 #-------------------------------------------
 # SUN 
 #------------------------------------------- 
@@ -109,7 +115,7 @@ time:
         then:
           - switch.turn_on: relay_4
 
-      - hours: 23
+      - hours: 22
         minutes: 0
         seconds: 0
         then:
@@ -126,8 +132,8 @@ light:
     num_leds: 1
     chipset: ws2812
     id: wifi_led
-    name: "Light status"
-  #  restore_mode: ALWAYS_ON
+#    name: "Light status"
+
 
 #  - platform: esp32_rmt_led_strip
 #    rgb_order: GRB
@@ -146,6 +152,7 @@ switch:
     name: "Розетка 1"
     icon: mdi:power-socket-eu
     pin: 6 #P7
+    restore_mode: RESTORE_DEFAULT_OFF
 
   - platform: gpio
     id: relay_2
@@ -159,6 +166,7 @@ switch:
     name: "Свет аквариум"
     icon: mdi:desk-lamp
     pin: 2 #P20
+    restore_mode: RESTORE_DEFAULT_OFF
 
   - platform: gpio
     id: relay_4
@@ -168,6 +176,7 @@ switch:
       number: 1 #P8
       inverted: True
       drive_strength: 40mA 
+    restore_mode: RESTORE_DEFAULT_OFF
 
   - platform: gpio
     id: relay_5
