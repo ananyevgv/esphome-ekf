@@ -139,4 +139,5 @@ longitude: 37.62
 
 ![Контроллер окна](./images/ekf1_4.png)
 ![Схема замены платы](./images/Schematic_ekf_2026-05-12.png)
-
+![Переделка MB60L](./images/MB60L-2.jpg)
+![Переделка увлажнителя](./images/Smartmi2-2.jpg)
