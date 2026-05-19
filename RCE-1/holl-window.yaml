@@ -101,7 +101,7 @@ sun:
   id: sun_state
   on_sunset:
     then:
-      switch.turn_on: relay_3
+      - switch.turn_on: relay_3
 
 #-------------------------------------------
 # TIME
@@ -113,7 +113,11 @@ time:
         minutes: 0
         seconds: 0
         then:
-          - switch.turn_on: relay_4
+          - if:
+              condition:
+                switch.is_on: morning_automation
+              then:
+                - switch.turn_on: relay_4
 
       - hours: 22
         minutes: 0
@@ -187,6 +191,14 @@ switch:
       inverted: true
       drive_strength: 40mA 
     restore_mode: ALWAYS_ON
+
+  - platform: template
+    name: "Утрение автоматизации"
+    optimistic: True
+    id: morning_automation
+    entity_category: config
+    restore_mode: RESTORE_DEFAULT_ON
+    icon: mdi:refresh-auto
 
 #-------------------------------------------
 #  BINARY_SENSOR
