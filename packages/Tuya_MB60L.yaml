@@ -9,8 +9,11 @@
 #      tuya_mcu_tx: 21
 #      open_weekends: 9
 #      open_workday: 7
+#      rotation: "Forbard" # "Reverse"
 # and copy file esphome/packages/
 
+
+  
 #-------------------------------------------
 # External_components:
 #------------------------------------------- 
@@ -76,13 +79,14 @@ switch:
 select:
   - platform: "tuya"
     tuya_id: mcu_$blind_id
-    name: "rotation${blind_id}"
+    name: "Rotation ${blind_id}"
+    id: rotation${blind_id}
     enum_datapoint: 11
-    optimistic: true
+ #   optimistic: true
     icon: "mdi:swap-horizontal"
     options:
-      0: Forbard
-      1: Reverse
+      0: "Forbard"
+      1: "Reverse"
 
   - platform: "tuya"
     tuya_id: mcu_$blind_id
@@ -90,9 +94,9 @@ select:
     enum_datapoint: 104
     optimistic: true
     options:
-      0: Low
-      1: Medium
-      2: Hight   
+      0: "Low"
+      1: "Medium"
+      2: "Hight"
       
   - platform: "tuya"
     tuya_id: mcu_$blind_id
@@ -100,9 +104,9 @@ select:
     enum_datapoint: 16
     optimistic: true
     options:
-      0: UP
-      1: DOWN
-      2: RESET
+      0: "UP"
+      1: "DOWN"
+      2: "RESET"
 
 #-------------------------------------------
 # Number
@@ -198,7 +202,9 @@ sun:
   on_sunrise:
     - if:
         condition:
-          lambda: 'return id(sntp_time).now().hour >= $open_weekends;'
+          and: 
+            - lambda: 'return id(sntp_time).now().hour >= $open_weekends;'
+            - switch.is_on: morning_automation
         then:
           - cover.open: cover_${blind_id}
 # Закат
