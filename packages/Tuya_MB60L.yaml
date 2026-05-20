@@ -49,14 +49,6 @@ sensor:
     sensor_datapoint: 19
     id: best_position_${blind_id}
 
-  - platform: "tuya"
-    tuya_id: mcu_$blind_id
-    name: "battary${blind_id}"
-    sensor_datapoint: 13
-    unit_of_measurement: "%"
-    device_class: battery
-    icon: "mdi:battery"
-
 #-------------------------------------------
 # Switch
 #------------------------------------------- 
@@ -228,6 +220,7 @@ time:
                 and:
                   - sun.is_above_horizon:
                   - binary_sensor.is_on: workday_sensor
+                  - switch.is_on: morning_automation
               then:
                 - cover.open: cover_${blind_id}
 # weekends
@@ -238,6 +231,7 @@ time:
           - if:
               condition:
                 - sun.is_above_horizon:
+                - switch.is_on: morning_automation
               then:
                 - cover.open: cover_${blind_id}   
                 
