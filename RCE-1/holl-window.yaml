@@ -27,10 +27,6 @@ esphome:
           red: 0%
           green: 70%
           blue: 0%
-      - delay: 1s
-      - select.set:
-          id: rotation_l
-          option: "Reverse"
 
 esp32:
   board: esp32-s3-devkitm-1
@@ -82,7 +78,6 @@ packages:
       tuya_mcu_tx: 13
       open_weekends: 9
       open_workday: 7
-      rotation: "Reverse"
 
   mb60p: !include 
     file: packages/Tuya_MB60L.yaml
@@ -92,7 +87,6 @@ packages:
       tuya_mcu_tx: 11
       open_weekends: 9
       open_workday: 7
-      rotation: 
       
 #-------------------------------------------
 # SUN 
@@ -137,15 +131,6 @@ light:
     chipset: ws2812
     id: wifi_led
 #    name: "Light status"
-
-
-#  - platform: esp32_rmt_led_strip
-#    rgb_order: GRB
-#    pin: GPIO21
-#    num_leds: 1
-#    chipset: ws2812
-#    id: board_led
-#    name: "Light board"
 
 #-------------------------------------------
 #  SWITCH
@@ -206,7 +191,7 @@ switch:
 binary_sensor:
   - platform: gpio
     id: toggle_relays
-    name: toggle_elays
+    name: toggle_relays
     device_class: plug
     internal: false
     pin:
