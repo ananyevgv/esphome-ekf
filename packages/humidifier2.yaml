@@ -12,8 +12,8 @@
 ##  |IO32|           |#|            |IO19| ##
 ##  |IO33|           |#|            |IO18| ##
 ##  |IO25|           |#|            |IO5 | ##
-##  |IO26|           |#|        TX  |IO17| ##
-##  |IO27|           |#|        RX  |IO16| ##
+##  |IO26|           |#|    PIC TX  |IO17| ##
+##  |IO27|           |#|    PIC RX  |IO16| ##
 ##  |IO14|           |#|            |IO4 | ##
 ##  |IO12|           |#|      boot  |IO0 | ##
 ##-----------------------------------------##
@@ -21,7 +21,7 @@
 ##                                       b ##
 ##                                       o ##
 ##                                       o ##
-##                                       t ##
+##   GPIO00 and GPIO02 connected to GND  t ##
 #############################################
 
 #-------------------------------------------
@@ -68,6 +68,29 @@ miot:
   uart_id: bus_miot
 
 #-------------------------------------------
+# Binary_sensor
+#------------------------------------------- 
+binary_sensor:
+  - platform: miot
+    miot_siid: 5
+    miot_piid: 1
+    name: "Alarm"
+
+#-------------------------------------------
+# Text_sensor
+#-------------------------------------------  
+text_sensor:
+  - platform: miot
+    miot_siid: 2
+    miot_piid: 2
+    name: "Device Fault"
+    entity_category: diagnostic
+    filters:
+      - map:
+        - "0 -> No Fault"
+        - "1 -> Insufficient Water"
+        - "2 -> Water Separation"
+#-------------------------------------------
 #  SWITCH
 #-------------------------------------------   
 switch:
@@ -76,18 +99,21 @@ switch:
     miot_piid: 8
     name: "Dry"
     icon: mdi:water-minus
+    
   - platform: "miot"
     miot_siid: 4
     miot_piid: 1
     name: "Notification Sounds"
     icon: mdi:volume-high
     entity_category: config
+    
   - platform: "miot"
     miot_siid: 6
     miot_piid: 1
     name: "Child Lock"
     icon: mdi:lock
     entity_category: config
+    
   - platform: "miot"
     miot_siid: 7
     miot_piid: 5
@@ -105,6 +131,7 @@ sensor:
     name: "Device Fault Code"
     icon: mdi:fan-alert
     entity_category: diagnostic
+    
   - platform: "miot"
     miot_siid: 3
     miot_piid: 7
@@ -113,14 +140,17 @@ sensor:
     device_class: temperature
     state_class: "measurement"
     icon: mdi:thermometer
+    accuracy_decimals: 1
+    
   - platform: "miot"
     miot_siid: 3
-    miot_piid: 9
+    miot_piid: 9 #1
     name: "Relative Humidity"
     unit_of_measurement: "%"
     device_class: humidity
     state_class: "measurement"
     icon: mdi:water-percent
+    
   - platform: "miot"
     miot_siid: 2
     miot_piid: 7
@@ -133,6 +163,7 @@ sensor:
           min_value: 0
           max_value: 100
           ignore_out_of_range: true
+          
   - platform: "miot"
     miot_siid: 2
     miot_piid: 11
@@ -140,6 +171,7 @@ sensor:
     unit_of_measurement: "rpm"
     icon: mdi:fan
   - platform: "miot"
+  
     miot_siid: 7
     miot_piid: 1
     name: "Actual Speed"
@@ -175,5 +207,20 @@ select:
       0: "Dark"
       1: "Glimmer"
       2: "Brightest"
-
-    
+      
+#-------------------------------------------
+# Number
+#------------------------------------------- 
+number:
+  - platform: miot
+    miot_siid: 2
+    miot_piid: 6
+    id: target_hum
+    name: "Target Humidity"
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+    mode: slider
+    min_value: 40
+    max_value: 70
+    step: 1
+    internal: false

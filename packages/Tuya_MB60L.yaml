@@ -58,6 +58,7 @@ switch:
     name: "CHILD LOCK${blind_id}"
     switch_datapoint: 101
     icon: "mdi:lock"
+    entity_category: config
 
   - platform: "tuya"
     tuya_id: mcu_$blind_id
@@ -79,7 +80,8 @@ select:
     options:
       0: "Forbard"
       1: "Reverse"
-
+    entity_category: config
+    
   - platform: "tuya"
     tuya_id: mcu_$blind_id
     name: "Speed${blind_id}"
@@ -89,7 +91,9 @@ select:
       0: "Low"
       1: "Medium"
       2: "Hight"
-      
+    entity_category: config
+    icon: mdi:speedometer
+    
   - platform: "tuya"
     tuya_id: mcu_$blind_id
     name: "Save pozition${blind_id}"
@@ -99,7 +103,9 @@ select:
       0: "UP"
       1: "DOWN"
       2: "RESET"
-
+    entity_category: config
+    icon: mdi:content-save-all-outline
+    
 #-------------------------------------------
 # Number
 #------------------------------------------- 
@@ -111,7 +117,9 @@ number:
     min_value: 0
     max_value: 100
     step: 10
-
+    entity_category: config
+    icon: mdi:blinds-horizontal
+    
 #-------------------------------------------
 # Cover
 #------------------------------------------- 
@@ -128,13 +136,6 @@ cover:
     min_value: 0
     max_value: 100
     device_class: blind
-   
-   #lambda: |-
-   # if (id(closed_endstop).state) {
-   #        return COVER_CLOSED;
-       #   } else {
-   #       return COVER_OPEN;
-   #             }    
    
 #-------------------------------------------
 # Button
@@ -234,25 +235,3 @@ time:
                 - switch.is_on: morning_automation
               then:
                 - cover.open: cover_${blind_id}   
-                
-
-# MB60L
-#[tuya:075]:   Datapoint 1: enum (value: 1)
-#[tuya:071]:   Datapoint 9: int value (value: 100)
-#[tuya:071]:   Datapoint 8: int value (value: 100)
-#[tuya:075]:   Datapoint 11: enum (value: 0)
-#[tuya:069]:   Datapoint 103: switch (value: OFF)
-#[tuya:069]:   Datapoint 101: switch (value: OFF)
-#[tuya:071]:   Datapoint 19: int value (value: 50)
-#[tuya:075]:   Datapoint 104: enum (value: 2)
-#[tuya:087]:   Product: '{"p":"ane3cx9ffd45xdpl","v":"1.0.0","m":2,"mt":3,"n":0}'
-
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_COVER_STATE_DP                0x01 //ENUM OPEN(0) STOP (1) CLOSE(2)	01
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_COVER_POSITION_DP             0x09					09
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_DIRECTION_DP                  0x0B  					11
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_BATTERY_DP                    0x0D					13
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_SET_LIMITS_DP                 0x10 //UP(0), DOWN(1), RESET(2)		16
-###define Z2S_ROLLER_SHUTTER_FNC_TUYA_MB60L_COVER        	          0x13					19
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_CHILD_LOCK_DP                 0x65					101
-#define TUYA_MB60L_SMART_BLINDS_MOTOR_TILT_MODE_DP                  0x67					103
-#####define Z2S_DEVICE_DESC_TUYA_MB60L_SMART_BLINDS_MOTOR           0x4824
