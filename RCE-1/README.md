@@ -151,7 +151,7 @@ web_password: "пароль_веб"
 latitude: 55.75
 longitude: 37.62
 ```
-![Lovelas](./images/windows-lovelas.jpg)
+![Lovelas](./images/windows-lovelas.jg)
 ![Контроллер окна](./images/ekf1_4.png)
 ![Схема замены платы](./images/Schematic_ekf_2026-05-12.png)
 ![Переделка MB60L](./images/MB60L-2.jpg)
