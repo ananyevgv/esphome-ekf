@@ -1,0 +1,45 @@
+type: vertical-stack
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:pic-shutter-card
+        entities:
+          - entity: cover.kitchen_window_motor_l
+            name: " "
+            title_position: bottom
+            outside_window: show
+            outside_window_pic: /local/community/pic-shutter-card/outwin2.png
+            shutter_slide_pic: /local/community/pic-shutter-card/sc_shutter_slide.png
+            shutter_animation: show
+      - type: custom:pic-shutter-card
+        entities:
+          - entity: cover.kitchen_window_motor_p
+            name: " "
+            title_position: bottom
+            outside_window: show
+            outside_window_pic: /local/community/pic-shutter-card/outwin2.png
+            shutter_slide_pic: /local/community/pic-shutter-card/sc_shutter_slide.png
+  - type: horizontal-stack
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-fan-card
+            entity: fan.kitchen_window_fan
+            name:
+              type: entity
+          - type: custom:mushroom-entity-card
+            entity: switch.kitchen_window_utrenie_avtomatizatsii
+            name:
+              type: entity
+      - type: vertical-stack
+        cards:
+          - type: custom:mushroom-entity-card
+            entity: number.kitchen_window_target_humidity
+            name:
+              type: entity
+          - type: custom:mushroom-entity-card
+            entity: sensor.kitchen_window_water_level
+            name:
+              type: entity
+            icon: mdi:cup-water
+title: Окно кухня
