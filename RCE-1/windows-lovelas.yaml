@@ -4,7 +4,7 @@ cards:
     cards:
       - type: custom:pic-shutter-card
         entities:
-          - entity: cover.kitchen_window_motor_l
+          - entity: cover.holl_window_motor_l
             name: " "
             title_position: bottom
             outside_window: show
@@ -13,7 +13,7 @@ cards:
             shutter_animation: show
       - type: custom:pic-shutter-card
         entities:
-          - entity: cover.kitchen_window_motor_p
+          - entity: cover.holl_window_motor_p
             name: " "
             title_position: bottom
             outside_window: show
@@ -24,22 +24,52 @@ cards:
       - type: vertical-stack
         cards:
           - type: custom:mushroom-fan-card
-            entity: fan.kitchen_window_fan
+            entity: fan.holl_window_fan
             name:
               type: entity
           - type: custom:mushroom-entity-card
-            entity: switch.kitchen_window_utrenie_avtomatizatsii
+            entity: switch.holl_window_utrenie_avtomatizatsii
             name:
               type: entity
       - type: vertical-stack
         cards:
           - type: custom:mushroom-entity-card
-            entity: number.kitchen_window_target_humidity
+            entity: number.holl_window_target_humidity
             name:
               type: entity
           - type: custom:mushroom-entity-card
-            entity: sensor.kitchen_window_water_level
+            entity: sensor.holl_window_water_level
             name:
               type: entity
             icon: mdi:cup-water
-title: Окно кухня
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_filtr_akvarium
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_uvlazhnitel
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_svet_akvarium
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_obogrevatel
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_zhaliuzi
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+title: Окно холл
