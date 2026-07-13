@@ -21,28 +21,93 @@ cards:
             shutter_slide_pic: /local/community/pic-shutter-card/sc_shutter_slide.png
   - type: horizontal-stack
     cards:
-      - type: vertical-stack
-        cards:
-          - type: custom:mushroom-fan-card
-            entity: fan.holl_window_fan
-            name:
-              type: entity
-          - type: custom:mushroom-entity-card
-            entity: switch.holl_window_utrenie_avtomatizatsii
-            name:
-              type: entity
-      - type: vertical-stack
-        cards:
-          - type: custom:mushroom-entity-card
-            entity: number.holl_window_target_humidity
-            name:
-              type: entity
-          - type: custom:mushroom-entity-card
-            entity: sensor.holl_window_water_level
-            name:
-              type: entity
-            icon: mdi:cup-water
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_rotation_l
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_save_pozition_l
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_speed_l
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_rotation_p
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_save_pozition_p
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+      - type: custom:mushroom-entity-card
+        entity: select.holl_window_speed_p
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: none
+  - type: custom:mushroom-entity-card
+    entity: switch.holl_window_utrenie_avtomatizatsii
+    name:
+      type: entity
+    icon_color: green
   - type: horizontal-stack
+    title: 💦 Увлажнитель
+    cards:
+      - type: custom:mushroom-fan-card
+        entity: fan.holl_window_fan
+        name:
+          type: entity
+      - type: custom:mushroom-entity-card
+        entity: switch.holl_window_dry
+        name:
+          type: entity
+        icon_color: yellow
+      - type: custom:mushroom-entity-card
+        entity: number.holl_window_target_humidity
+        name:
+          type: entity
+  - type: horizontal-stack
+    cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.holl_window_water_level
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: state
+        icon: mdi:cup-water
+      - type: custom:mushroom-entity-card
+        entity: sensor.holl_window_temperature
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: state
+        icon_color: yellow
+      - type: custom:mushroom-entity-card
+        entity: sensor.holl_window_relative_humidity
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: state
+      - type: custom:mushroom-entity-card
+        entity: sensor.holl_window_actual_speed
+        name:
+          type: entity
+        primary_info: none
+        secondary_info: state
+  - type: horizontal-stack
+    title: 🔌 Удлинитель
     cards:
       - type: custom:mushroom-entity-card
         entity: switch.holl_window_filtr_akvarium
@@ -60,16 +125,19 @@ cards:
           type: entity
         primary_info: none
         secondary_info: none
+        icon_color: yellow
       - type: custom:mushroom-entity-card
         entity: switch.holl_window_obogrevatel
         name:
           type: entity
         primary_info: none
         secondary_info: none
+        icon_color: accent
       - type: custom:mushroom-entity-card
         entity: switch.holl_window_zhaliuzi
         name:
           type: entity
         primary_info: none
         secondary_info: none
-title: Окно холл
+        icon_color: purple
+title: 🪟 Окно холл
