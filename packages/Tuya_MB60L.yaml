@@ -136,7 +136,7 @@ cover:
     min_value: 0
     max_value: 100
     device_class: blind
-   
+    invert_position: $reverse
 #-------------------------------------------
 # Button
 #------------------------------------------- 
