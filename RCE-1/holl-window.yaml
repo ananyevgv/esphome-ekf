@@ -60,7 +60,7 @@ i2c:
 packages:
   wifi: !include packages/wifi.yaml
   device_base: !include packages/device_base.yaml
-  web: !include included/web.yaml
+
   time: !include included/time.yaml
   sun: !include packages/sensor/sun.yaml
 
@@ -78,6 +78,7 @@ packages:
       tuya_mcu_tx: 13
       open_weekends: 9
       open_workday: 7
+      reverse: true
 
   mb60p: !include 
     file: packages/Tuya_MB60L.yaml
@@ -87,6 +88,7 @@ packages:
       tuya_mcu_tx: 11
       open_weekends: 9
       open_workday: 7
+      reverse: false
       
 #-------------------------------------------
 # SUN 
@@ -112,14 +114,18 @@ time:
                 switch.is_on: morning_automation
               then:
                 - switch.turn_on: relay_4
-
+                - select.set_index:
+                    id: display_brigh
+                    index: 2
       - hours: 22
         minutes: 0
         seconds: 0
         then:
           - switch.turn_off: relay_3
           - switch.turn_off: relay_4
-
+          - select.set_index:
+              id: display_brigh
+              index: 1
 #-------------------------------------------
 #  LIGHT
 #-------------------------------------------   
@@ -138,10 +144,10 @@ light:
 switch:
   - platform: gpio
     id: relay_1
-    name: "Розетка 1"
-    icon: mdi:power-socket-eu
+    name: "Обогреватель"
+    icon: mdi:heating-coil
     pin: 6 #P7
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ALWAYS_ON
 
   - platform: gpio
     id: relay_2

@@ -78,7 +78,9 @@ packages:
       tuya_mcu_tx: 13
       open_weekends: 9
       open_workday: 7
+      reverse: false
 
+      
   mb60p: !include 
     file: packages/Tuya_MB60L.yaml
     vars:
@@ -87,7 +89,8 @@ packages:
       tuya_mcu_tx: 11
       open_weekends: 9
       open_workday: 7
-
+      reverse: true
+      
 #-------------------------------------------
 #  LIGHT
 #-------------------------------------------   
