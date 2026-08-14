@@ -47,7 +47,7 @@
 | Tuya MB60L (зона 2) | 10 (RX) / 11 (TX) |
 | Увлажнитель MIoT (UART) | 44 (TX) / 43 (RX) |
 
-> ⚠️ **Важно:** Для использования двух моторов Tuya MB60L требуется установка `MULTI_CONF = True` в компоненте Tuya.
+> ⚠️ **Важно:** Для использования двух моторов Tuya MB60L требуется установка `MULTI_CONF = True` в компоненте Tuya в файле __init__.py.
 
 ---
 
@@ -135,22 +135,8 @@ esphome-ekf/
     ├── sun.yaml                 # Положение солнца
     ├── Tuya_MB60L.yaml          # Драйвер жалюзи
     └── humidifier2.yaml         # Драйвер увлажнителя Smartmi
-
-
 ```
 
-**Пример содержимого `secrets.yaml`:**
-
-```yaml
-wifi_ssid: "ваша_сеть"
-wifi_password: "ваша пароль"
-api_key: "ключ_шифрования"
-ota_password: "пароль_ota"
-web_username: "имя пользователя"
-web_password: "пароль_веб"
-latitude: 55.75
-longitude: 37.62
-```
 ![Lovelas](./images/windows-lovelas.jpg)
 ![Контроллер окна](./images/ekf1_4.png)
 ![Схема замены платы](./images/Schematic_ekf_2026-05-12.png)
