@@ -117,16 +117,6 @@ esphome-ekf/
 └── secrets.yaml # Пароли, ключи, SSID
 ```
 
-**Пример `secrets.yaml`:**
-
-```yaml
-wifi_ssid: "ваша_сеть"
-wifi_password: "пароль"
-api_key: "ключ_шифрования"
-ota_password: "пароль_ota"
-web_username: "admin"
-web_password: "пароль_веб"
-```
 
 # Калибровочные значения BL0942, текущая калибровка (рассчитана для данного экземпляра)
 ```
